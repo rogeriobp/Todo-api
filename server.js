@@ -1,19 +1,11 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 var PORT = process.env.PORT || 3000;
-var todos = [{
-    id: 1,
-    description: 'Meet Lais for lunch',
-    completed: false
-}, {
-    id: 2,
-    description: 'Go to GYM!',
-    completed: false
-}, {
-    id: 3,
-    description: 'Drink beer',
-    completed: true
-}];
+var todos = [];
+var todosnextId = 1;
+
+app.use(bodyParser.json());
 
 // GET /todos
 app.get('/todos', function(req,res){
@@ -36,6 +28,23 @@ app.get('/todos/:id', function(req, res) {
     } else {
         res.status(404).send();
     }
+});
+
+// POST /todos
+app.post('/todos', function(req,res) {
+    var body = req.body;
+    // add id field
+    
+    if (todos === undefined){
+        body.id = 1;
+    } else {
+        body.id = todos.length + 1;
+    }
+    
+    todos.push(body);
+    console.log(todos);
+    
+    res.json(body);
 });
 
 app.get('/', function(req, res){
