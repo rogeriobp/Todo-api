@@ -58,6 +58,19 @@ app.post('/todos', function(req,res) {
     res.json(body);
 });
 
+// DELETE /todos/:id
+app.delete('/todos/:id', function(req,res) {
+    var todoId = parseInt(req.params.id, 10);
+    var matchedTodo = _.findWhere(todos, {id: todoId});
+    
+    if (matchedTodo) {
+        res.json(todos.splice(todos.indexOf(matchedTodo),1)); //todos = _.without(todos, matchedTodo)
+//        res.json(matchedTodo);Hi A
+    } else {
+        res.status(404).json({"error": "no todo found with that id"});
+    }
+});
+
 app.get('/', function(req, res){
     res.send('Todo API Root');
 });
