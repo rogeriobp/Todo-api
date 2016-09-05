@@ -25,7 +25,9 @@ app.get('/todos', function(req,res){
     }
     
     if (query.hasOwnProperty('q') && query.q.length > 0) {
-        where.description = {$like: '%' + query.q + '%'};
+        where.description = {
+            $like: '%' + query.q + '%'
+        };
     }
     
     db.todo.findAll({where: where}).then(function(todos){
@@ -118,15 +120,43 @@ app.post('/todos', function(req,res) {
 // DELETE /todos/:id
 app.delete('/todos/:id', function(req,res) {
     var todoId = parseInt(req.params.id, 10);
-    var matchedTodo = _.findWhere(todos, {id: todoId});
     
-    if (matchedTodo) {
-        res.json(todos.splice(todos.indexOf(matchedTodo),1)); //todos = _.without(todos, matchedTodo)
-//        res.json(matchedTodo);
-    } else {
-        res.status(404).json({"error": "no todo found with that id"});
-    }
+    db.todo.destroy({
+        where: {
+            id: todoId
+        }
+    }).then(function(rowsDeleted) {
+        if (rowsDeleted === 0) {
+            res.status(404).json({
+                error: 'No todo with id found'
+            });
+        } else {
+            res.status(204).send();
+        }
+    }, function(){
+        res.status(500).send();
+    });
 });
+    
+//    var matchedTodo = _.findWhere(todos, {id: todoId});
+//    db.todo.findById(todoId).then(function(matchedTodo){
+//        if(!!matchedTodo){
+//            matchedTodo.destroy();
+//            res.json(matchedTodo);
+//        } else {
+//            res.status(404).json({"error": "No todo found with that id"});
+//        }}, function(e){
+//        res.status(500).json(e);
+//    });
+//});
+    
+//    if (matchedTodo) {
+//        res.json(todos.splice(todos.indexOf(matchedTodo),1)); //todos = _.without(todos, matchedTodo)
+////        res.json(matchedTodo);
+//    } else {
+//        res.status(404).json({"error": "no todo found with that id"});
+//    }
+//});
 
 // PUT /todos/:id
 app.put('/todos/:id', function(req, res) {
