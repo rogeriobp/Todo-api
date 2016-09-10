@@ -163,7 +163,7 @@ app.post('/users/login', function(req, res){
         }
         
     }, function(e) {
-        res.status(401).send();
+        res.status(401).send(e);
     });
 })
 
